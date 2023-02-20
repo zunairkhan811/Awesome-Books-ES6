@@ -2,6 +2,7 @@
 /* eslint-disable comma-dangle */
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-use-before-define */
+
 class Book {
     constructor(title, author) {
       this.title = title;
@@ -95,16 +96,35 @@ class Book {
         .previousElementSibling.textContent
     );
   });
+
+  import { DateTime } from "./modules/luxon/src/luxon.js";
   
-  // current date & time
-  const date = document.getElementById('date');
-  
-  function displayDate() {
+  let displayDate = () => {
     const date = document.getElementById('date');
-    date.innerHTML = Date();
-  
+    let dt = DateTime.now();
+    date.innerHTML = dt.toLocaleString(DateTime.DATETIME_MED);
     setInterval(displayDate, 1000);
   }
   
   displayDate(date);
+
+  import {pageOne, pageTwo, pageThree, listLink, addLink, contactLink} from './modules/module1.js'
+
+  listLink.addEventListener('click', () => {
+    pageOne.style.display = 'flex';
+    pageTwo.style.display = 'none';
+    pageThree.style.display = 'none';
+  });
+  
+  addLink.addEventListener('click', () => {
+    pageOne.style.display = 'none';
+    pageTwo.style.display = 'flex';
+    pageThree.style.display = 'none';
+  });
+  
+  contactLink.addEventListener('click', () => {
+    pageOne.style.display = 'none';
+    pageTwo.style.display = 'none';
+    pageThree.style.display = 'flex';
+  });
   
