@@ -1,9 +1,10 @@
+/* eslint-disable import/no-unresolved */
 /* eslint-disable no-alert */
 /* eslint-disable comma-dangle */
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-use-before-define */
 
-import { DateTime } from './node_modules/luxon/src/luxon.js';
+import { DateTime } from '../node_modules/luxon/src/luxon.js';
 
 import {
   pageOne, pageTwo, pageThree, listLink, addLink, contactLink
