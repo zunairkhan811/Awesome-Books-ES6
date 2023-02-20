@@ -1,12 +1,12 @@
-import { padStart, roundTo, hasRelative } from "./util.js";
-import * as English from "./english.js";
-import Settings from "../settings.js";
-import DateTime from "../datetime.js";
-import IANAZone from "../zones/IANAZone.js";
+import { padStart, roundTo, hasRelative } from './util.js';
+import * as English from './english.js';
+import Settings from '../settings.js';
+import DateTime from '../datetime.js';
+import IANAZone from '../zones/IANAZone.js';
 
 // todo - remap caching
 
-let intlLFCache = {};
+const intlLFCache = {};
 function getCachedLF(locString, opts = {}) {
   const key = JSON.stringify([locString, opts]);
   let dtf = intlLFCache[key];
@@ -55,10 +55,9 @@ let sysLocaleCache = null;
 function systemLocale() {
   if (sysLocaleCache) {
     return sysLocaleCache;
-  } else {
-    sysLocaleCache = new Intl.DateTimeFormat().resolvedOptions().locale;
-    return sysLocaleCache;
   }
+  sysLocaleCache = new Intl.DateTimeFormat().resolvedOptions().locale;
+  return sysLocaleCache;
 }
 
 function parseLocaleString(localeStr) {
@@ -73,35 +72,34 @@ function parseLocaleString(localeStr) {
   // private subtags and unicode subtags have ordering requirements,
   // and we're not properly parsing this, so just strip out the
   // private ones if they exist.
-  const xIndex = localeStr.indexOf("-x-");
+  const xIndex = localeStr.indexOf('-x-');
   if (xIndex !== -1) {
     localeStr = localeStr.substring(0, xIndex);
   }
 
-  const uIndex = localeStr.indexOf("-u-");
+  const uIndex = localeStr.indexOf('-u-');
   if (uIndex === -1) {
     return [localeStr];
-  } else {
-    let options;
-    let selectedStr;
-    try {
-      options = getCachedDTF(localeStr).resolvedOptions();
-      selectedStr = localeStr;
-    } catch (e) {
-      const smaller = localeStr.substring(0, uIndex);
-      options = getCachedDTF(smaller).resolvedOptions();
-      selectedStr = smaller;
-    }
-
-    const { numberingSystem, calendar } = options;
-    return [selectedStr, numberingSystem, calendar];
   }
+  let options;
+  let selectedStr;
+  try {
+    options = getCachedDTF(localeStr).resolvedOptions();
+    selectedStr = localeStr;
+  } catch (e) {
+    const smaller = localeStr.substring(0, uIndex);
+    options = getCachedDTF(smaller).resolvedOptions();
+    selectedStr = smaller;
+  }
+
+  const { numberingSystem, calendar } = options;
+  return [selectedStr, numberingSystem, calendar];
 }
 
 function intlConfigString(localeStr, numberingSystem, outputCalendar) {
   if (outputCalendar || numberingSystem) {
-    if (!localeStr.includes("-u-")) {
-      localeStr += "-u";
+    if (!localeStr.includes('-u-')) {
+      localeStr += '-u';
     }
 
     if (outputCalendar) {
@@ -112,9 +110,8 @@ function intlConfigString(localeStr, numberingSystem, outputCalendar) {
       localeStr += `-nu-${numberingSystem}`;
     }
     return localeStr;
-  } else {
-    return localeStr;
   }
+  return localeStr;
 }
 
 function mapMonths(f) {
@@ -138,26 +135,24 @@ function mapWeekdays(f) {
 function listStuff(loc, length, defaultOK, englishFn, intlFn) {
   const mode = loc.listingMode(defaultOK);
 
-  if (mode === "error") {
+  if (mode === 'error') {
     return null;
-  } else if (mode === "en") {
+  } if (mode === 'en') {
     return englishFn(length);
-  } else {
-    return intlFn(length);
   }
+  return intlFn(length);
 }
 
 function supportsFastNumbers(loc) {
-  if (loc.numberingSystem && loc.numberingSystem !== "latn") {
+  if (loc.numberingSystem && loc.numberingSystem !== 'latn') {
     return false;
-  } else {
-    return (
-      loc.numberingSystem === "latn" ||
-      !loc.locale ||
-      loc.locale.startsWith("en") ||
-      new Intl.DateTimeFormat(loc.intl).resolvedOptions().numberingSystem === "latn"
-    );
   }
+  return (
+    loc.numberingSystem === 'latn'
+      || !loc.locale
+      || loc.locale.startsWith('en')
+      || new Intl.DateTimeFormat(loc.intl).resolvedOptions().numberingSystem === 'latn'
+  );
 }
 
 /**
@@ -182,11 +177,10 @@ class PolyNumberFormatter {
     if (this.inf) {
       const fixed = this.floor ? Math.floor(i) : i;
       return this.inf.format(fixed);
-    } else {
-      // to match the browser's numberformatter defaults
-      const fixed = this.floor ? Math.floor(i) : roundTo(i, 3);
-      return padStart(fixed, this.padTo);
     }
+    // to match the browser's numberformatter defaults
+    const fixed = this.floor ? Math.floor(i) : roundTo(i, 3);
+    return padStart(fixed, this.padTo);
   }
 }
 
@@ -198,7 +192,7 @@ class PolyDateFormatter {
   constructor(dt, intl, opts) {
     this.opts = opts;
 
-    let z = undefined;
+    let z;
     if (dt.zone.isUniversal) {
       // UTC-8 or Etc/UTC-8 are not part of tzdata, only Etc/GMT+8 and the like.
       // That is why fixed-offset TZ is set to that unless it is:
@@ -219,14 +213,14 @@ class PolyDateFormatter {
         // 2. The format options don't tell us to show the zone. Then we can adjust them
         // the time and tell the formatter to show it to us in UTC, so that the time is right
         // and the bad zone doesn't show up.
-        z = "UTC";
+        z = 'UTC';
         if (opts.timeZoneName) {
           this.dt = dt;
         } else {
           this.dt = dt.offset === 0 ? dt : DateTime.fromMillis(dt.ts + dt.offset * 60 * 1000);
         }
       }
-    } else if (dt.zone.type === "system") {
+    } else if (dt.zone.type === 'system') {
       this.dt = dt;
     } else {
       this.dt = dt;
@@ -256,7 +250,7 @@ class PolyDateFormatter {
  */
 class PolyRelFormatter {
   constructor(intl, isEnglish, opts) {
-    this.opts = { style: "long", ...opts };
+    this.opts = { style: 'long', ...opts };
     if (!isEnglish && hasRelative()) {
       this.rtf = getCachedRTF(intl, opts);
     }
@@ -265,17 +259,15 @@ class PolyRelFormatter {
   format(count, unit) {
     if (this.rtf) {
       return this.rtf.format(count, unit);
-    } else {
-      return English.formatRelativeTime(unit, count, this.opts.numeric, this.opts.style !== "long");
     }
+    return English.formatRelativeTime(unit, count, this.opts.numeric, this.opts.style !== 'long');
   }
 
   formatToParts(count, unit) {
     if (this.rtf) {
       return this.rtf.formatToParts(count, unit);
-    } else {
-      return [];
     }
+    return [];
   }
 }
 
@@ -291,7 +283,7 @@ export default class Locale {
   static create(locale, numberingSystem, outputCalendar, defaultToEN = false) {
     const specifiedLocale = locale || Settings.defaultLocale;
     // the system locale is useful for human readable strings but annoying for parsing/formatting known formats
-    const localeR = specifiedLocale || (defaultToEN ? "en-US" : systemLocale());
+    const localeR = specifiedLocale || (defaultToEN ? 'en-US' : systemLocale());
     const numberingSystemR = numberingSystem || Settings.defaultNumberingSystem;
     const outputCalendarR = outputCalendar || Settings.defaultOutputCalendar;
     return new Locale(localeR, numberingSystemR, outputCalendarR, specifiedLocale);
@@ -335,23 +327,21 @@ export default class Locale {
 
   listingMode() {
     const isActuallyEn = this.isEnglish();
-    const hasNoWeirdness =
-      (this.numberingSystem === null || this.numberingSystem === "latn") &&
-      (this.outputCalendar === null || this.outputCalendar === "gregory");
-    return isActuallyEn && hasNoWeirdness ? "en" : "intl";
+    const hasNoWeirdness = (this.numberingSystem === null || this.numberingSystem === 'latn')
+      && (this.outputCalendar === null || this.outputCalendar === 'gregory');
+    return isActuallyEn && hasNoWeirdness ? 'en' : 'intl';
   }
 
   clone(alts) {
     if (!alts || Object.getOwnPropertyNames(alts).length === 0) {
       return this;
-    } else {
-      return Locale.create(
-        alts.locale || this.specifiedLocale,
-        alts.numberingSystem || this.numberingSystem,
-        alts.outputCalendar || this.outputCalendar,
-        alts.defaultToEN || false
-      );
     }
+    return Locale.create(
+      alts.locale || this.specifiedLocale,
+      alts.numberingSystem || this.numberingSystem,
+      alts.outputCalendar || this.outputCalendar,
+      alts.defaultToEN || false,
+    );
   }
 
   redefaultToEN(alts = {}) {
@@ -364,10 +354,10 @@ export default class Locale {
 
   months(length, format = false, defaultOK = true) {
     return listStuff(this, length, defaultOK, English.months, () => {
-      const intl = format ? { month: length, day: "numeric" } : { month: length },
-        formatStr = format ? "format" : "standalone";
+      const intl = format ? { month: length, day: 'numeric' } : { month: length };
+      const formatStr = format ? 'format' : 'standalone';
       if (!this.monthsCache[formatStr][length]) {
-        this.monthsCache[formatStr][length] = mapMonths((dt) => this.extract(dt, intl, "month"));
+        this.monthsCache[formatStr][length] = mapMonths((dt) => this.extract(dt, intl, 'month'));
       }
       return this.monthsCache[formatStr][length];
     });
@@ -376,13 +366,13 @@ export default class Locale {
   weekdays(length, format = false, defaultOK = true) {
     return listStuff(this, length, defaultOK, English.weekdays, () => {
       const intl = format
-          ? { weekday: length, year: "numeric", month: "long", day: "numeric" }
-          : { weekday: length },
-        formatStr = format ? "format" : "standalone";
+        ? {
+          weekday: length, year: 'numeric', month: 'long', day: 'numeric',
+        }
+        : { weekday: length };
+      const formatStr = format ? 'format' : 'standalone';
       if (!this.weekdaysCache[formatStr][length]) {
-        this.weekdaysCache[formatStr][length] = mapWeekdays((dt) =>
-          this.extract(dt, intl, "weekday")
-        );
+        this.weekdaysCache[formatStr][length] = mapWeekdays((dt) => this.extract(dt, intl, 'weekday'));
       }
       return this.weekdaysCache[formatStr][length];
     });
@@ -398,14 +388,14 @@ export default class Locale {
         // In theory there could be aribitrary day periods. We're gonna assume there are exactly two
         // for AM and PM. This is probably wrong, but it's makes parsing way easier.
         if (!this.meridiemCache) {
-          const intl = { hour: "numeric", hourCycle: "h12" };
+          const intl = { hour: 'numeric', hourCycle: 'h12' };
           this.meridiemCache = [DateTime.utc(2016, 11, 13, 9), DateTime.utc(2016, 11, 13, 19)].map(
-            (dt) => this.extract(dt, intl, "dayperiod")
+            (dt) => this.extract(dt, intl, 'dayperiod'),
           );
         }
 
         return this.meridiemCache;
-      }
+      },
     );
   }
 
@@ -416,9 +406,7 @@ export default class Locale {
       // This is problematic. Different calendars are going to define eras totally differently. What I need is the minimum set of dates
       // to definitely enumerate them.
       if (!this.eraCache[length]) {
-        this.eraCache[length] = [DateTime.utc(-40, 1, 1), DateTime.utc(2017, 1, 1)].map((dt) =>
-          this.extract(dt, intl, "era")
-        );
+        this.eraCache[length] = [DateTime.utc(-40, 1, 1), DateTime.utc(2017, 1, 1)].map((dt) => this.extract(dt, intl, 'era'));
       }
 
       return this.eraCache[length];
@@ -426,9 +414,9 @@ export default class Locale {
   }
 
   extract(dt, intlOpts, field) {
-    const df = this.dtFormatter(dt, intlOpts),
-      results = df.formatToParts(),
-      matching = results.find((m) => m.type.toLowerCase() === field);
+    const df = this.dtFormatter(dt, intlOpts);
+    const results = df.formatToParts();
+    const matching = results.find((m) => m.type.toLowerCase() === field);
     return matching ? matching.value : null;
   }
 
@@ -452,17 +440,17 @@ export default class Locale {
 
   isEnglish() {
     return (
-      this.locale === "en" ||
-      this.locale.toLowerCase() === "en-us" ||
-      new Intl.DateTimeFormat(this.intl).resolvedOptions().locale.startsWith("en-us")
+      this.locale === 'en'
+      || this.locale.toLowerCase() === 'en-us'
+      || new Intl.DateTimeFormat(this.intl).resolvedOptions().locale.startsWith('en-us')
     );
   }
 
   equals(other) {
     return (
-      this.locale === other.locale &&
-      this.numberingSystem === other.numberingSystem &&
-      this.outputCalendar === other.outputCalendar
+      this.locale === other.locale
+      && this.numberingSystem === other.numberingSystem
+      && this.outputCalendar === other.outputCalendar
     );
   }
 }

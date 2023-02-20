@@ -6,4 +6,6 @@ const listLink = document.querySelector('.list-page');
 const addLink = document.querySelector('.add-page');
 const contactLink = document.querySelector('.contact-page');
 
-export {pageOne, pageTwo, pageThree, navbar, listLink, addLink, contactLink};
+export {
+  pageOne, pageTwo, pageThree, navbar, listLink, addLink, contactLink,
+};
