@@ -102,7 +102,9 @@ document.querySelector('#book-addition').addEventListener('click', (e) => {
       .previousElementSibling.textContent
   );
 });
+
 const date = document.getElementById('date');
+
 const displayDate = () => {
   const dt = DateTime.now();
   date.innerHTML = dt.toLocaleString(DateTime.DATETIME_MED);
