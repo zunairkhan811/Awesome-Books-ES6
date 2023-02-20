@@ -3,7 +3,7 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-use-before-define */
 
-import { DateTime } from './modules/luxon/src/luxon.js';
+import { DateTime } from './node_modules/luxon/src/luxon.js';
 
 import {
   pageOne, pageTwo, pageThree, listLink, addLink, contactLink
@@ -102,9 +102,8 @@ document.querySelector('#book-addition').addEventListener('click', (e) => {
       .previousElementSibling.textContent
   );
 });
-
+const date = document.getElementById('date');
 const displayDate = () => {
-  const date = document.getElementById('date');
   const dt = DateTime.now();
   date.innerHTML = dt.toLocaleString(DateTime.DATETIME_MED);
   setInterval(displayDate, 1000);
