@@ -1,4 +1,4 @@
-import { DateTime } from '../modules/luxon.js';
+import { DateTime } from '/modules/luxon.js';
 
 import {
   pageOne, pageTwo, pageThree, listLink, addLink, contactLink,
