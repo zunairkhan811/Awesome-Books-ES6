@@ -1,79 +1,12 @@
-/* eslint-disable import/no-unresolved */
-/* eslint-disable no-alert */
-/* eslint-disable comma-dangle */
-/* eslint-disable max-classes-per-file */
-/* eslint-disable no-use-before-define */
-
-import { DateTime } from '../node_modules/luxon/src/luxon.js';
+import { DateTime } from './node_modules/luxon/src/luxon.js';
 
 import {
-  pageOne, pageTwo, pageThree, listLink, addLink, contactLink
-} from './modules/module1.js';
+  pageOne, pageTwo, pageThree, listLink, addLink, contactLink,
+} from './modules/navigation_module.js';
 
-class Book {
-  constructor(title, author) {
-    this.title = title;
-    this.author = author;
-  }
-}
-
-class ui {
-  static displaybooks() {
-    const books = store.getbooks();
-    books.forEach((book) => ui.addbooktolist(book));
-  }
-
-  static addbooktolist(book) {
-    const list = document.querySelector('#book-addition');
-    const div = document.createElement('div');
-    div.innerHTML = `
-          <p>${book.title}</p>
-          <p>by</p>
-          <p>${book.author}</p>
-          <Button class="remove-btn">Remove</Button>
-          `;
-    list.appendChild(div);
-  }
-
-  static deletebook(el) {
-    if (el.classList.contains('remove-btn')) {
-      el.parentElement.remove();
-    }
-  }
-
-  static clearFields() {
-    document.querySelector('#title').value = '';
-    document.querySelector('#author').value = '';
-  }
-}
-
-class store {
-  static getbooks() {
-    let books;
-    if (localStorage.getItem('books') === null) {
-      books = [];
-    } else {
-      books = JSON.parse(localStorage.getItem('books'));
-    }
-    return books;
-  }
-
-  static addbook(book) {
-    const books = store.getbooks();
-    books.push(book);
-    localStorage.setItem('books', JSON.stringify(books));
-  }
-
-  static removebook(title) {
-    const books = store.getbooks();
-    books.forEach((book, index) => {
-      if (book.title === title) {
-        books.splice(index, 1);
-      }
-    });
-    localStorage.setItem('books', JSON.stringify(books));
-  }
-}
+import ui from './modules/ui_module.js';
+import store from './modules/store_module.js';
+import Book from './modules/book_module.js';
 
 document.addEventListener('DOMContentLoaded', ui.displaybooks);
 
@@ -83,10 +16,10 @@ document.querySelector('#form').addEventListener('submit', (e) => {
   const author = document.querySelector('#author').value;
 
   if (title === '' || author === '') {
+    // eslint-disable-next-line no-alert
     alert('Please fill in all fields');
   } else {
     const book = new Book(title, author);
-    // console.log(book);
 
     ui.addbooktolist(book);
 
@@ -100,7 +33,7 @@ document.querySelector('#book-addition').addEventListener('click', (e) => {
   ui.deletebook(e.target);
   store.removebook(
     e.target.previousElementSibling.previousElementSibling
-      .previousElementSibling.textContent
+      .previousElementSibling.textContent,
   );
 });
 
